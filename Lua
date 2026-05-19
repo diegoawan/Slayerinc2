@@ -1,87 +1,87 @@
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
+local a=game:GetService("Players")
+local b=game:GetService("ReplicatedStorage")
+local c=game:GetService("Workspace")
 
-local ResetRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Reset")
-local CollectRemote = ReplicatedStorage:WaitForChild("CollectionRemotes"):WaitForChild("CollectItem")
-local BuyUpgradeRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("BuyUpgrade")
-local DamageRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("DamageNpc")
-local OpenRuneRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("OpenRune")
+local d=b:WaitForChild("Events"):WaitForChild("Reset")
+local e=b:WaitForChild("CollectionRemotes"):WaitForChild("CollectItem")
+local f=b:WaitForChild("Events"):WaitForChild("BuyUpgrade")
+local g=b:WaitForChild("Events"):WaitForChild("DamageNpc")
+local h=b:WaitForChild("Events"):WaitForChild("OpenRune")
 
-local Collectibles = Workspace:WaitForChild("ClientCollectibles")
+local i=c:WaitForChild("ClientCollectibles")
 
-local MainTab = Window:CreateTab("Main", 4483362458)
-local UpgradeTab = Window:CreateTab("Upgrades", 4483362458)
-local RuneTab = Window:CreateTab("Runes", 4483362458)
+local j=Window:CreateTab("Main",4483362458)
+local k=Window:CreateTab("Upgrades",4483362458)
+local l=Window:CreateTab("Runes",4483362458)
 
-local AutoClass = false
-local AutoCollect = false
-local AutoDamage = false
+getgenv().x1=false
+getgenv().x2=false
+getgenv().x3=false
 
-local AutoPower = false
-local AutoSpawnSpeed = false
-local AutoSpawnCap = false
+getgenv().u1=false
+getgenv().u2=false
+getgenv().u3=false
 
-local AutoEssencePower = false
-local AutoEssenceGain = false
-local AutoEssenceXP = false
-local AutoEssenceMagma = false
+getgenv().e1=false
+getgenv().e2=false
+getgenv().e3=false
+getgenv().e4=false
 
-local AutoMagmaGain = false
-local AutoMagmaSpeed = false
-local AutoMagmaXP = false
-local AutoMagmaPower = false
+getgenv().m1=false
+getgenv().m2=false
+getgenv().m3=false
+getgenv().m4=false
 
-local AutoStarterRune = false
-local AutoGoldenRune = false
+getgenv().r1=false
+getgenv().r2=false
+getgenv().r3=false
 
-local CollectedItems = {}
+local m={}
 
-Collectibles.ChildRemoved:Connect(function(child)
-	CollectedItems[child.Name] = nil
+i.ChildRemoved:Connect(function(n)
+	m[n.Name]=nil
 end)
 
-MainTab:CreateToggle({
-	Name = "Auto Class",
-	CurrentValue = false,
-	Flag = "AutoClass",
-	Callback = function(Value)
-		AutoClass = Value
+local function o(p,q)
+	task.spawn(function()
+		while p() do
+			pcall(q)
+			task.wait(0.1)
+		end
+	end)
+end
 
-		if AutoClass then
-			task.spawn(function()
-				while AutoClass do
-					pcall(function()
-						ResetRemote:FireServer("ClassUp")
-					end)
-
-					task.wait(0.1)
-				end
+j:CreateToggle({
+	Name="Auto Class",
+	CurrentValue=false,
+	Flag="ac",
+	Callback=function(v)
+		x1=v
+		if x1 then
+			o(function() return x1 end,function()
+				d:FireServer("ClassUp")
 			end)
 		end
 	end
 })
 
-MainTab:CreateToggle({
-	Name = "Auto Collect",
-	CurrentValue = false,
-	Flag = "AutoCollect",
-	Callback = function(Value)
-		AutoCollect = Value
-
-		if AutoCollect then
+j:CreateToggle({
+	Name="Auto Collect",
+	CurrentValue=false,
+	Flag="acol",
+	Callback=function(v)
+		x2=v
+		if x2 then
 			task.spawn(function()
-				while AutoCollect do
-					for _, v in ipairs(Collectibles:GetChildren()) do
-						if not CollectedItems[v.Name] then
-							CollectedItems[v.Name] = true
-
+				while x2 do
+					for _,y in ipairs(i:GetChildren()) do
+						if not m[y.Name] then
+							m[y.Name]=true
 							pcall(function()
-								CollectRemote:FireServer(v.Name)
+								e:FireServer(y.Name)
 							end)
 						end
 					end
-
 					task.wait(0.05)
 				end
 			end)
@@ -89,328 +89,101 @@ MainTab:CreateToggle({
 	end
 })
 
-MainTab:CreateToggle({
-	Name = "Auto Damage",
-	CurrentValue = false,
-	Flag = "AutoDamage",
-	Callback = function(Value)
-		AutoDamage = Value
-
-		if AutoDamage then
-			task.spawn(function()
-				while AutoDamage do
-					pcall(function()
-						DamageRemote:InvokeServer()
-					end)
-
-					task.wait(0.1)
-				end
+j:CreateToggle({
+	Name="Auto Damage",
+	CurrentValue=false,
+	Flag="admg",
+	Callback=function(v)
+		x3=v
+		if x3 then
+			o(function() return x3 end,function()
+				g:InvokeServer()
 			end)
 		end
 	end
 })
 
-UpgradeTab:CreateParagraph({
-	Title = "Power Upgrades",
-	Content = ""
-})
+k:CreateParagraph({Title="Power Upgrades",Content=""})
 
-UpgradeTab:CreateToggle({
-	Name = "Auto Power",
-	CurrentValue = false,
-	Flag = "AutoPower",
-	Callback = function(Value)
-		AutoPower = Value
+local function z(a1,a2,a3)
+	return function(v)
+		_G[a3]=v
+		if _G[a3] then
+			o(function() return _G[a3] end,function()
+				f:FireServer(a1,a2,true)
+			end)
+		end
+	end
+end
 
-		if AutoPower then
-			task.spawn(function()
-				while AutoPower do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("PowerUpgrades", "Power", true)
-					end)
+k:CreateToggle({Name="Auto Power",CurrentValue=false,Flag="p1",Callback=z("PowerUpgrades","Power","u1")})
+k:CreateToggle({Name="Auto Spawn Speed",CurrentValue=false,Flag="p2",Callback=z("PowerUpgrades","SpawnSpeed","u2")})
+k:CreateToggle({Name="Auto Spawn Cap",CurrentValue=false,Flag="p3",Callback=z("PowerUpgrades","SpawnCap","u3")})
 
-					task.wait(0.1)
-				end
+k:CreateParagraph({Title="Essence Upgrades",Content=""})
+
+k:CreateToggle({Name="Auto Power Gain",CurrentValue=false,Flag="e1",Callback=z("EssenceUpgrades","Power","e1")})
+k:CreateToggle({Name="Auto Essence Gain",CurrentValue=false,Flag="e2",Callback=z("EssenceUpgrades","Essence","e2")})
+k:CreateToggle({Name="Auto Player XP",CurrentValue=false,Flag="e3",Callback=z("EssenceUpgrades","PlrXp","e3")})
+k:CreateToggle({Name="Auto Magma",CurrentValue=false,Flag="e4",Callback=z("EssenceUpgrades","Magma","e4")})
+
+k:CreateParagraph({Title="World 2 - Magma",Content=""})
+
+k:CreateToggle({Name="Auto Magma Gain",CurrentValue=false,Flag="m1",Callback=z("MagmaUpgrades","Magma","m1")})
+k:CreateToggle({Name="Auto Magma Speed",CurrentValue=false,Flag="m2",Callback=z("MagmaUpgrades","MagmaTimer","m2")})
+k:CreateToggle({
+	Name="Auto Magma Player XP",
+	CurrentValue=false,
+	Flag="m3",
+	Callback=function(v)
+		m3=v
+		if m3 then
+			o(function() return m3 end,function()
+				f:FireServer("MagmaUpgrades","PlrXp",false)
 			end)
 		end
 	end
 })
 
-UpgradeTab:CreateToggle({
-	Name = "Auto Spawn Speed",
-	CurrentValue = false,
-	Flag = "AutoSpawnSpeed",
-	Callback = function(Value)
-		AutoSpawnSpeed = Value
+k:CreateToggle({Name="Auto Magma Power",CurrentValue=false,Flag="m4",Callback=z("MagmaUpgrades","Power","m4")})
 
-		if AutoSpawnSpeed then
-			task.spawn(function()
-				while AutoSpawnSpeed do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("PowerUpgrades", "SpawnSpeed", true)
-					end)
-
-					task.wait(0.1)
-				end
+l:CreateToggle({
+	Name="Auto Starter Rune",
+	CurrentValue=false,
+	Flag="r1",
+	Callback=function(v)
+		r1=v
+		if r1 then
+			o(function() return r1 end,function()
+				h:FireServer("Starter")
 			end)
 		end
 	end
 })
 
-UpgradeTab:CreateToggle({
-	Name = "Auto Spawn Cap",
-	CurrentValue = false,
-	Flag = "AutoSpawnCap",
-	Callback = function(Value)
-		AutoSpawnCap = Value
-
-		if AutoSpawnCap then
-			task.spawn(function()
-				while AutoSpawnCap do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("PowerUpgrades", "SpawnCap", true)
-					end)
-
-					task.wait(0.1)
-				end
+l:CreateToggle({
+	Name="Auto Golden Rune",
+	CurrentValue=false,
+	Flag="r2",
+	Callback=function(v)
+		r2=v
+		if r2 then
+			o(function() return r2 end,function()
+				h:FireServer("Golden")
 			end)
 		end
 	end
 })
 
-UpgradeTab:CreateParagraph({
-	Title = "Essence Upgrades",
-	Content = ""
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Power Gain",
-	CurrentValue = false,
-	Flag = "AutoEssencePower",
-	Callback = function(Value)
-		AutoEssencePower = Value
-
-		if AutoEssencePower then
-			task.spawn(function()
-				while AutoEssencePower do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("EssenceUpgrades", "Power", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Essence Gain",
-	CurrentValue = false,
-	Flag = "AutoEssenceGain",
-	Callback = function(Value)
-		AutoEssenceGain = Value
-
-		if AutoEssenceGain then
-			task.spawn(function()
-				while AutoEssenceGain do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("EssenceUpgrades", "Essence", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Player XP",
-	CurrentValue = false,
-	Flag = "AutoEssenceXP",
-	Callback = function(Value)
-		AutoEssenceXP = Value
-
-		if AutoEssenceXP then
-			task.spawn(function()
-				while AutoEssenceXP do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("EssenceUpgrades", "PlrXp", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Magma",
-	CurrentValue = false,
-	Flag = "AutoEssenceMagma",
-	Callback = function(Value)
-		AutoEssenceMagma = Value
-
-		if AutoEssenceMagma then
-			task.spawn(function()
-				while AutoEssenceMagma do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("EssenceUpgrades", "Magma", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateParagraph({
-	Title = "World 2 - Magma",
-	Content = ""
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Magma Gain",
-	CurrentValue = false,
-	Flag = "AutoMagmaGain",
-	Callback = function(Value)
-		AutoMagmaGain = Value
-
-		if AutoMagmaGain then
-			task.spawn(function()
-				while AutoMagmaGain do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("MagmaUpgrades", "Magma", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Magma Speed",
-	CurrentValue = false,
-	Flag = "AutoMagmaSpeed",
-	Callback = function(Value)
-		AutoMagmaSpeed = Value
-
-		if AutoMagmaSpeed then
-			task.spawn(function()
-				while AutoMagmaSpeed do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("MagmaUpgrades", "MagmaTimer", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Magma Player XP",
-	CurrentValue = false,
-	Flag = "AutoMagmaXP",
-	Callback = function(Value)
-		AutoMagmaXP = Value
-
-		if AutoMagmaXP then
-			task.spawn(function()
-				while AutoMagmaXP do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("MagmaUpgrades", "PlrXp", false)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-UpgradeTab:CreateToggle({
-	Name = "Auto Magma Power",
-	CurrentValue = false,
-	Flag = "AutoMagmaPower",
-	Callback = function(Value)
-		AutoMagmaPower = Value
-
-		if AutoMagmaPower then
-			task.spawn(function()
-				while AutoMagmaPower do
-					pcall(function()
-						BuyUpgradeRemote:FireServer("MagmaUpgrades", "Power", true)
-					end)
-
-					task.wait(0.1)
-				end
-			end)
-		end
-	end
-})
-
-RuneTab:CreateToggle({
-	Name = "Auto Starter Rune Speed",
-	CurrentValue = false,
-	Flag = "AutoStarterRune",
-	Callback = function(Value)
-		AutoStarterRune = Value
-
-		if AutoStarterRune then
-			task.spawn(function()
-				while AutoStarterRune do
-					pcall(function()
-						OpenRuneRemote:FireServer("Starter")
-					end)
-
-					task.wait(0)
-				end
-			end)
-		end
-	end
-})
-
-RuneTab:CreateToggle({
-	Name = "Auto Golden Rune Speed",
-	CurrentValue = false,
-	Flag = "AutoGoldenRune",
-	Callback = function(Value)
-		AutoGoldenRune = Value
-
-		if AutoGoldenRune then
-			task.spawn(function()
-				while AutoGoldenRune do
-					pcall(function()
-						OpenRuneRemote:FireServer("Golden")
-					end)
-
-					task.wait(0)
-				end
-			end)
-
-RuneTab:CreateToggle({
-	Name = "Auto Magma Rune",
-	CurrentValue = false,
-	Flag = "AutoMagmaRune",
-	Callback = function(Value)
-		AutoMagmaRune = Value
-
-		if AutoMagmaRune then
-			task.spawn(function()
-				while AutoMagmaRune do
-					pcall(function()
-						OpenRuneRemote:FireServer("Magmer")
-					end)
-
-					task.wait(0)
-				end
+l:CreateToggle({
+	Name="Auto Magma Rune",
+	CurrentValue=false,
+	Flag="r3",
+	Callback=function(v)
+		r3=v
+		if r3 then
+			o(function() return r3 end,function()
+				h:FireServer("Magmer")
 			end)
 		end
 	end
