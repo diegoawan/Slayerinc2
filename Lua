@@ -17,6 +17,7 @@ local RuneTab = Window:CreateTab("Runes", 4483362458)
 getgenv().b1 = false
 getgenv().b2 = false
 getgenv().b3 = false
+getgenv().b4 = false
 
 getgenv().c1 = false
 getgenv().c2 = false
@@ -87,6 +88,27 @@ MainTab:CreateToggle({
 					task.wait(0.05)
 				end
 			end)
+		end
+	end
+})
+
+MainTab:CreateToggle({
+	Name = "Auto Upgrade Tree",
+	CurrentValue = false,
+	Flag = "x4",
+	Callback = function(v)
+		b4 = v
+
+		if b4 then
+			Loop(function()
+				return b4
+			end, function()
+				for i = 1,100 do
+					pcall(function()
+						ReplicatedStorage:WaitForChild("Events"):WaitForChild("BuyTreeUpgrade"):FireServer("Magma", "Upgrade" .. i)
+					end)
+				end
+			end,0.5)
 		end
 	end
 })
