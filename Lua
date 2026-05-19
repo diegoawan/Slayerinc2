@@ -370,7 +370,7 @@ RuneTab:CreateToggle({
 						OpenRuneRemote:FireServer("Starter")
 					end)
 
-					task.wait(0.1)
+					task.wait(0)
 				end
 			end)
 		end
@@ -391,7 +391,25 @@ RuneTab:CreateToggle({
 						OpenRuneRemote:FireServer("Golden")
 					end)
 
-					task.wait(0.1)
+					task.wait(0)
+				end
+			end)
+
+RuneTab:CreateToggle({
+	Name = "Auto Magma Rune",
+	CurrentValue = false,
+	Flag = "AutoMagmaRune",
+	Callback = function(Value)
+		AutoMagmaRune = Value
+
+		if AutoMagmaRune then
+			task.spawn(function()
+				while AutoMagmaRune do
+					pcall(function()
+						OpenRuneRemote:FireServer("Magmer")
+					end)
+
+					task.wait(0)
 				end
 			end)
 		end
