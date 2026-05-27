@@ -23,7 +23,6 @@ getgenv().b2 = false
 getgenv().b3 = false
 getgenv().b4 = false
 getgenv().b5 = false
-getgenv().AutoCrit = false
 
 getgenv().c1 = false
 getgenv().c2 = false
@@ -209,33 +208,6 @@ MainTab:CreateToggle({
 					end)
 
 					task.wait(0.5)
-				end
-			end)
-		end
-	end
-})
-
-MainTab:CreateToggle({
-	Name = "Auto Crit",
-	CurrentValue = false,
-	Flag = "AutoCrit",
-	Callback = function(v)
-		AutoCrit = v
-
-		if AutoCrit then
-			task.spawn(function()
-				while AutoCrit do
-					pcall(function()
-						local critButton = getNil("ActiveCritPrompt", "ImageButton")
-
-						if critButton then
-							for _, connection in ipairs(getconnections(critButton.MouseButton1Click)) do
-								connection:Fire()
-							end
-						end
-					end)
-
-					task.wait()
 				end
 			end)
 		end
