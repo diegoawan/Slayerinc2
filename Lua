@@ -53,14 +53,6 @@ local function Loop(cond, func, delay)
 	end)
 end
 
-local getNil = function(name, class)
-	for _, v in next, getnilinstances() do
-		if v.ClassName == class and v.Name == name then
-			return v
-		end
-	end
-end
-
 MainTab:CreateToggle({
 	Name = "Auto Class",
 	CurrentValue = false,
