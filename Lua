@@ -2,12 +2,15 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+local LocalPlayer = Players.LocalPlayer
+
 local ResetRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Reset")
 local CollectRemote = ReplicatedStorage:WaitForChild("CollectionRemotes"):WaitForChild("CollectItem")
 local BuyUpgradeRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("BuyUpgrade")
 local DamageRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("DamageNpc")
 local OpenRuneRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("OpenRune")
 local BuyTreeRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("BuyTreeUpgrade")
+local RedeemCodeRemote = ReplicatedStorage:WaitForChild("RedeemCode")
 
 local CollectiblesFolder = Workspace:WaitForChild("ClientCollectibles")
 
@@ -20,6 +23,7 @@ getgenv().b2 = false
 getgenv().b3 = false
 getgenv().b4 = false
 getgenv().b5 = false
+getgenv().AutoCrit = false
 
 getgenv().c1 = false
 getgenv().c2 = false
@@ -37,6 +41,7 @@ getgenv().e4 = false
 
 getgenv().f1 = false
 getgenv().f2 = false
+getgenv().f3 = false
 
 getgenv().LavaDelay = 1
 
@@ -47,6 +52,14 @@ local function Loop(cond, func, delay)
 			task.wait(delay or 0.1)
 		end
 	end)
+end
+
+local getNil = function(name, class)
+	for _, v in next, getnilinstances() do
+		if v.ClassName == class and v.Name == name then
+			return v
+		end
+	end
 end
 
 MainTab:CreateToggle({
@@ -78,24 +91,24 @@ MainTab:CreateToggle({
 				while b2 do
 					for _, obj in ipairs(CollectiblesFolder:GetChildren()) do
 						pcall(function()
-							local pos
+							local char = LocalPlayer.Character
+							local hrp = char and char:FindFirstChild("HumanoidRootPart")
 
-							if obj:IsA("BasePart") then
-								pos = obj.Position
-							elseif obj:IsA("Model") then
-								pos = obj:GetPivot().Position
-							end
+							if hrp and obj:IsA("Instance") then
+								local cf
 
-							if pos then
-								CollectRemote:FireServer(
-									obj.Name,
-									Vector3.new(pos.X, pos.Y, pos.Z)
-								)
+								pcall(function()
+									cf = obj:GetPivot()
+								end)
+
+								if cf then
+									hrp.CFrame = cf + Vector3.new(0,3,0)
+								end
 							end
 						end)
 					end
 
-					task.wait()
+					task.wait(0.05)
 				end
 			end)
 		end
@@ -167,6 +180,62 @@ MainTab:CreateToggle({
 					end)
 
 					task.wait(LavaDelay)
+				end
+			end)
+		end
+	end
+})
+
+local CodesRedeemed = false
+
+MainTab:CreateToggle({
+	Name = "Auto Codes",
+	CurrentValue = false,
+	Flag = "AutoCodes",
+	Callback = function(v)
+		if v and not CodesRedeemed then
+			CodesRedeemed = true
+
+			task.spawn(function()
+				local Codes = {
+					"Plasma",
+					"VolcanicPartTwo",
+					"SorryForTheLag"
+				}
+
+				for _, code in ipairs(Codes) do
+					pcall(function()
+						RedeemCodeRemote:FireServer(code)
+					end)
+
+					task.wait(0.5)
+				end
+			end)
+		end
+	end
+})
+
+MainTab:CreateToggle({
+	Name = "Auto Crit",
+	CurrentValue = false,
+	Flag = "AutoCrit",
+	Callback = function(v)
+		AutoCrit = v
+
+		if AutoCrit then
+			task.spawn(function()
+				while AutoCrit do
+					pcall(function()
+						local critButton = getNil("ActiveCritPrompt", "ImageButton")
+
+						if critButton then
+							for _, connection in ipairs(getconnections(critButton.MouseButton1Click)) do
+								connection:Fire()
+							end
+						end
+					end)
+
+					task.wait()
 				end
 			end)
 		end
@@ -296,6 +365,13 @@ UpgradeTab:CreateToggle({
 	CurrentValue = false,
 	Flag = "pl2",
 	Callback = BuyLoop("PlasmaPointsUpgrades","PlrXp","f2",true)
+})
+
+UpgradeTab:CreateToggle({
+	Name = "Auto Plasma Gain",
+	CurrentValue = false,
+	Flag = "pl3",
+	Callback = BuyLoop("PlasmaPointsUpgrades","Plasma","f3",true)
 })
 
 local AutoStarterRune = false
